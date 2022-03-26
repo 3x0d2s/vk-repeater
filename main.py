@@ -50,7 +50,7 @@ def repeat_photos(event):
 
         user = vk_session.method(method='users.get',
                                  values={'user_id': event.object.from_id,
-                                         'name_case': "acc",
+                                         'name_case': "gen",
                                          }
                                  )
         user_first_name = user[0]["first_name"]
