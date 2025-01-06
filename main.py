@@ -11,7 +11,7 @@ from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
 def send_message(event, text=None, attachment_arg=None):
     vk_session.method(
         method='messages.send',
-        values={'user_id': event.object.from_id,
+        values={'user_id': event.object['message']['from_id'],
                 'message': text,
                 'attachment': attachment_arg,
                 'random_id': get_random_id(),
@@ -20,7 +20,7 @@ def send_message(event, text=None, attachment_arg=None):
 
 
 def repeat_photos(event):
-    message_attachments = event.object.attachments
+    message_attachments = event.object['message']['attachments']
 
     counter_for_non_photos = 0
     attachment_arg = ""
@@ -49,7 +49,7 @@ def repeat_photos(event):
                      )
 
         user = vk_session.method(method='users.get',
-                                 values={'user_id': event.object.from_id,
+                                 values={'user_id': event.object['message']['from_id'],
                                          'name_case': "gen",
                                          }
                                  )
@@ -57,7 +57,8 @@ def repeat_photos(event):
         user_last_name = user[0]["last_name"]
 
         logger.info(
-            msg=f"Обработаны фотографии {user_first_name} {user_last_name} (https://vk.com/id{event.object.from_id})."
+            msg=f"Обработаны фотографии {user_first_name} {user_last_name} "
+                f"(https://vk.com/id{event.object.from_id})."
         )
 
 
@@ -83,14 +84,14 @@ def main():
         if event.type == VkBotEventType.MESSAGE_NEW:
             if event.from_user:
 
-                message_text = event.object["text"]
+                message = event.object['message']
 
-                if message_text == "Начать":
+                if message['text'] == "Начать":
                     start_text = "Привет! 😊\nЯ - чат-бот для добавления твоих фотографий в «Сохранёнки»!" \
                         "\nОтправь мне свои фотографии, а я перешлю их тебе, после чего ты сможешь добавить их к себе в альбом!"
                     send_message(event=event, text=start_text)
                     #
-                elif len(event.object.attachments) == 0:
+                elif len(message['attachments']) == 0:
                     text = "Отправь мне фотографии, чтобы я помог тебе! 😊"
                     send_message(event=event, text=text)
                     #
